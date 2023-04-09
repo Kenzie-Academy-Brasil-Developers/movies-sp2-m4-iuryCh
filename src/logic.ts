@@ -46,17 +46,24 @@ const listMovies = async (req: Request, res: Response): Promise<Response> => {
 
     queryResult = await client.query(queryConfig);
 
-
-  }
-  else {
+    if (queryResult.rowCount === 0) {
+      const queryString: string = `
+        
+        SELECT * 
+        FROM movies
+      
+      `;
+      queryResult = await client.query(queryString);
+    }
+  } else {
     const queryString: string = `
         
         SELECT * 
         FROM movies
         
     `;
-    queryResult = await client.query(queryString);
 
+    queryResult = await client.query(queryString);
   }
 
   return res.json(queryResult.rows);

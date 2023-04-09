@@ -1,22 +1,27 @@
 import { Request, Response } from 'express';
 import { QueryConfig, QueryResult } from 'pg';
-import { TMovie } from './interfaces';
+import { TMovie, TMovieRequest } from './interfaces';
 import { client } from './database';
+import format from 'pg-format';
 
 const createMovie = async (req: Request, res: Response): Promise<Response> => {
-  const queryString: string = `
+  const movieData: TMovieRequest = req.body;
+
+  const queryString: string = format(
+    `
         
         INSERT INTO movies
-            (name, category, duration, price)
+            (%I)
         VALUES
-            ('Homem aranha', 'fantasia', 120, 30)
+            (%L)
         RETURNING *;
     
-    `;
+    `,
+    Object.keys(movieData),
+    Object.values(movieData)
+  );
 
   const queryResult: QueryResult<TMovie> = await client.query(queryString);
-
-  console.log(queryResult);
 
   return res.status(201).json(queryResult.rows[0]);
 };
@@ -43,4 +48,51 @@ const retrieveMovie = async (
   return res.json(movie);
 };
 
-export { createMovie, listMovies, retrieveMovie };
+const updateMovie = async (req: Request, res: Response): Promise<Response> => {
+  const movieData = req.body;
+  const id: number = Number(req.params.id);
+
+  const queryString: string = format(
+    `
+            UPDATE movies
+            SET(%I) = ROW(%L)
+            WHERE id = $1
+            RETURNING *;
+
+        `,
+    Object.keys(movieData),
+    Object.values(movieData)
+  );
+
+  const queryConfig: QueryConfig = {
+    text: queryString,
+    values: [id],
+  };
+
+  const queryResult: QueryResult = await client.query(queryConfig);
+
+  return res.json(queryResult.rows[0]);
+};
+
+const deleteMovie = async (req: Request, res: Response): Promise<Response> => {
+  const id = Number(req.params.id);
+
+  const queryString: string = `
+    
+    DELETE
+    FROM movies
+    WHERE id = $1
+  
+  `;
+
+  const queryConfig: QueryConfig = {
+    text: queryString,
+    values: [id],
+  };
+
+  await client.query(queryConfig);
+
+  return res.status(204).send();
+};
+
+export { createMovie, listMovies, retrieveMovie, updateMovie, deleteMovie };

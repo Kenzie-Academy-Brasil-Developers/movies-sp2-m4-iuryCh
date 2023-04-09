@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+﻿import { Request, Response } from 'express';
 import { QueryConfig, QueryResult } from 'pg';
 import { TMovie, TMovieRequest } from './interfaces';
 import { client } from './database';
@@ -38,7 +38,8 @@ const listMovies = async (req: Request, res: Response): Promise<Response> => {
         FROM movies
         WHERE category = $1
 
-        `;
+      `;
+
     const queryConfig: QueryConfig = {
       text: queryString,
       values: [category],
@@ -81,6 +82,12 @@ const retrieveMovie = async (
 const updateMovie = async (req: Request, res: Response): Promise<Response> => {
   const movieData = req.body;
   const id: number = Number(req.params.id);
+
+  if (movieData.id) {
+    return res.status(400).json({
+      error: 'it is not possible to change id',
+    });
+  }
 
   const queryString: string = format(
     `

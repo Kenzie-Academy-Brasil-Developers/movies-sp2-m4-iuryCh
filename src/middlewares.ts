@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { QueryConfig, QueryResult } from 'pg';
 import { client } from './database';
 
-const movieExistsMiddleware = async (
+const movieIdExistsMiddleware = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -32,4 +32,35 @@ const movieExistsMiddleware = async (
   return next();
 };
 
-export { movieExistsMiddleware };
+const movieNameExists = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  const name: any = req.body.name;
+  console.log(name);
+
+  const queryString: string = `
+    SELECT *
+    FROM movies
+    WHERE name = $1
+  
+  `;
+
+  const queryConfig: QueryConfig = {
+    text: queryString,
+    values: [name],
+  };
+
+  const queryResult: QueryResult = await client.query(queryConfig);
+
+  if (queryResult.rowCount === 1) {
+    return res.status(409).json({
+      error: 'Movie name already exists!',
+    });
+  }
+
+  return next();
+};
+
+export { movieIdExistsMiddleware, movieNameExists };

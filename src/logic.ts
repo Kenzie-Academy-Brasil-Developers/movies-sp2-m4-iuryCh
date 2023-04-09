@@ -27,14 +27,37 @@ const createMovie = async (req: Request, res: Response): Promise<Response> => {
 };
 
 const listMovies = async (req: Request, res: Response): Promise<Response> => {
-  const queryString: string = `
+  const category: any = req.query.category;
+
+  let queryResult: QueryResult;
+
+  if (category) {
+    const queryString: string = `
         
         SELECT * 
         FROM movies
+        WHERE category = $1
 
+        `;
+    const queryConfig: QueryConfig = {
+      text: queryString,
+      values: [category],
+    };
+
+    queryResult = await client.query(queryConfig);
+
+
+  }
+  else {
+    const queryString: string = `
+        
+        SELECT * 
+        FROM movies
+        
     `;
+    queryResult = await client.query(queryString);
 
-  const queryResult: QueryResult<TMovie> = await client.query(queryString);
+  }
 
   return res.json(queryResult.rows);
 };

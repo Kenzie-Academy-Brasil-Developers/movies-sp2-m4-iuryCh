@@ -7,15 +7,23 @@ import {
   updateMovie,
 } from './logic';
 import { startDatabase } from './database';
-import { movieIdExistsMiddleware, movieNameExists } from './middlewares';
+import {
+  movieIdExistsMiddleware,
+  movieNameExistsMiddleware,
+} from './middlewares';
 
 const app: Application = express();
 app.use(express.json());
 
-app.post('/movies', movieNameExists, createMovie);
+app.post('/movies', movieNameExistsMiddleware, createMovie);
 app.get('/movies', listMovies);
 app.get('/movies/:id', movieIdExistsMiddleware, retrieveMovie);
-app.patch('/movies/:id', movieIdExistsMiddleware, movieNameExists, updateMovie);
+app.patch(
+  '/movies/:id',
+  movieIdExistsMiddleware,
+  movieNameExistsMiddleware,
+  updateMovie
+);
 app.delete('/movies/:id', movieIdExistsMiddleware, deleteMovie);
 
 const PORT = 3000;

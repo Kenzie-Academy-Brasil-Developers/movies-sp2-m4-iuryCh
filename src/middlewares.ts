@@ -32,7 +32,7 @@ const movieIdExistsMiddleware = async (
   return next();
 };
 
-const movieNameExists = async (
+const movieNameExistsMiddleware = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -63,4 +63,4 @@ const movieNameExists = async (
   return next();
 };
 
-export { movieIdExistsMiddleware, movieNameExists };
+export { movieIdExistsMiddleware, movieNameExistsMiddleware };

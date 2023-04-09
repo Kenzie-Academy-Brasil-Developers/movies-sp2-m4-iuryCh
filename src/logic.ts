@@ -80,10 +80,11 @@ const retrieveMovie = async (
 };
 
 const updateMovie = async (req: Request, res: Response): Promise<Response> => {
-  const movieData = req.body;
-  const id: number = Number(req.params.id);
+  const movieData: Partial<TMovieRequest> = req.body;
+  const movieId: number = Number(req.params.id);
+  const id = 'id';
 
-  if (movieData.id) {
+  if (Reflect.has(movieData, id)) {
     return res.status(400).json({
       error: 'it is not possible to change id',
     });
@@ -103,7 +104,7 @@ const updateMovie = async (req: Request, res: Response): Promise<Response> => {
 
   const queryConfig: QueryConfig = {
     text: queryString,
-    values: [id],
+    values: [movieId],
   };
 
   const queryResult: QueryResult = await client.query(queryConfig);

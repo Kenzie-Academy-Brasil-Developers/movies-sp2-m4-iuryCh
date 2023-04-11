@@ -37,8 +37,8 @@ const movieNameExistsMiddleware = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const name: any = req.body.name;
-  console.log(name);
+  const name: string = req.body.name;
+ 
 
   const queryString: string = `
     SELECT *

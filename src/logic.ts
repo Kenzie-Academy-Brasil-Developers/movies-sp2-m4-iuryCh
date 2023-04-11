@@ -27,7 +27,7 @@ const createMovie = async (req: Request, res: Response): Promise<Response> => {
 };
 
 const listMovies = async (req: Request, res: Response): Promise<Response> => {
-  const { category } = req.query;
+  const category: string = String(req.query.category);
 
   let queryResult: QueryResult;
 

@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { QueryConfig, QueryResult } from 'pg';
 import { client } from './database';
+import { TMovie } from './interfaces';
 
 const movieIdExistsMiddleware = async (
   req: Request,
@@ -19,7 +20,7 @@ const movieIdExistsMiddleware = async (
     values: [id],
   };
 
-  const queryResult: QueryResult = await client.query(queryConfig);
+  const queryResult: QueryResult<TMovie> = await client.query(queryConfig);
 
   if (queryResult.rowCount === 0) {
     return res.status(404).json({
@@ -37,8 +38,8 @@ const movieNameExistsMiddleware = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const name: string = req.body.name;
- 
+  //req.body não é pra ser tipado, pois ele é tipo any
+  const name = req.body.name;
 
   const queryString: string = `
     SELECT *
@@ -52,7 +53,7 @@ const movieNameExistsMiddleware = async (
     values: [name],
   };
 
-  const queryResult: QueryResult = await client.query(queryConfig);
+  const queryResult: QueryResult<TMovie> = await client.query(queryConfig);
 
   if (queryResult.rowCount === 1) {
     return res.status(409).json({

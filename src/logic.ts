@@ -8,13 +8,12 @@ const createMovie = async (req: Request, res: Response): Promise<Response> => {
   const movieData: TMovieRequest = req.body;
 
   const queryString: string = format(
-    `
-        
-        INSERT INTO movies
-            (%I)
-        VALUES
-            (%L)
-        RETURNING *;
+    `      
+      INSERT INTO movies
+        (%I)
+      VALUES
+        (%L)
+      RETURNING *;
     
     `,
     Object.keys(movieData),
@@ -107,7 +106,7 @@ const updateMovie = async (req: Request, res: Response): Promise<Response> => {
     values: [movieId],
   };
 
-  const queryResult: QueryResult = await client.query(queryConfig);
+  const queryResult: QueryResult<TMovie> = await client.query(queryConfig);
 
   return res.json(queryResult.rows[0]);
 };
